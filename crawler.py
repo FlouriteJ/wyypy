@@ -1,17 +1,27 @@
-import sys,io
-
+import os
 import requests
 import re
 import time
 import threading
+import random
+import pickle
+from pynm import *
 
-headers = {
-"Host":"music.163.com",
-"Referer":"http://music.163.com/",
-"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"}
-
-
-def getLinks(text): #From Index&Search
+def refresh():
+	fileList = ['song','url','playlist','visit']
+	for file in fileList:
+		if os.path.exists(file):
+			os.remove(file)
+		
+def getLinks(text):
+	global maxUrl,urlSet
+	if len(urlSet)>maxUrl:
+		alpha = 0
+	else:
+		alpha = 1.0 - (float(len(urlSet))/maxUrl)**2
+	Random = random.random()
+	if Random > alpha:
+		return
 	urlset = set()
 	for x in detectPlaylist(text):
 		urlset.add('http://music.163.com/playlist?id=' + x)
@@ -20,33 +30,9 @@ def getLinks(text): #From Index&Search
 	for x in detectUser(text):
 		urlset.add('http://music.163.com/user/home?id=' + x)
 		#TODO: fans & followings
-	# for x in detectAbum(text):
-		# urlset.add('http://music.163.com/album?id=' + x)		
-	return list(urlset)
-	
-def detectPlaylist(text):
-	playList = re.findall(r"(?:/playlist\?id=)(\d+)",text)
-	# print("playList Len= ",end = '')
-	# print(len(playList))
-	return playList
-
-def detectSong(text):
-	songList = re.findall(r"(?:/song\?id=)(\d+)",text)
-	# print("songList Len= ",end = '')
-	# print(len(songList))
-	return songList
-	
-def detectUser(text):
-	userList = re.findall(r"(?:/user/home\?id=)(\d+)",text)
-	# print("userList Len= ",end = '')
-	# print(len(userList))
-	return userList
-
-def detectAbum(text):
-	albumList = re.findall(r"(?:/album\?id=)(\d+)",text)
-	# print("albumList Len= ",end = '')
-	# print(len(albumList))
-	return albumList
+	for x in detectAbum(text):
+		urlset.add('http://music.163.com/album?id=' + x)		
+	return list(urlset)	
 	
 def union_bfs(a,b):
 	# l = []
@@ -61,20 +47,8 @@ def union_bfs(a,b):
 	a.extend(b)
 	a.reverse()
 	
-filePlaylist = open("playlist",'a')
-fileSong = open("song",'a')
-
-maxPage = 30000000
-maxThreads = 500
-urlSet = ["http://music.163.com/discover/playlist"]
-hashVisited = {}
-hashPlaylist = {}
-hashSonglist = {}
-threads = 0
-lock = threading.Lock()
-
 def deal(curPage):
-	global lock,maxPage,urlSet,hashPlaylist,hashSonglist,threads
+	global lock,Page,urlSet,hashPlaylist,hashSong,threads,songs
 	try:
 		r = requests.get(curPage,headers = headers,timeout=1)
 	except:
@@ -85,10 +59,7 @@ def deal(curPage):
 	text = r.text
 	dpl = detectPlaylist(text)
 	ds = detectSong(text)
-	if len(urlSet)<2000000:
-		links = getLinks(text)
-	else:
-		links = []
+	links = getLinks(text)
 	if lock.acquire():
 		for x in dpl:
 			if(hashPlaylist.get(x,False)==False):
@@ -96,14 +67,15 @@ def deal(curPage):
 				filePlaylist.write(x+'\n')
 		
 		for x in ds:
-			if(hashSonglist.get(x,False)==False):
-				hashSonglist[x] = True
+			if(hashSong.get(x,False)==False):
+				hashSong[x] = True
 				fileSong.write(x+'\n')
+				songs+=1
 		# print("linksNum: ",end = '')
 		# print(len(links))
 		if links:
 			union_bfs(urlSet,links)
-		maxPage-=1
+		Page+=1
 		threads-=1
 		lock.release()
 
@@ -121,21 +93,79 @@ def getUrlset():
 		lock.release()
 	return x	
 
-while maxPage>0 and (getUrlset() or getThreads()):
+# Initialization
+refresh()
+Page = 0
+maxThreads = 500
+hashVisited = {}
+hashPlaylist = {}
+hashSong = {}
+threads = 0
+lock = threading.Lock()
+songs = 0
+maxUrl = 200000
+printTime = 0
+timeLast = time.time()
+
+if os.path.exists('playlist'):
+	filePlaylist = open("playlist",'r')
+	for line in filePlaylist:
+		hashPlaylist[line.strip('\n')] = True
+	filePlaylist.close()
+
+if os.path.exists('song'):
+	fileSong = open("song",'r')
+	for line in fileSong:
+		hashSong[line.strip('\n')] = True	
+	fileSong.close()
+	
+if os.path.exists('url'):
+	urlSet = pickle.load(open('url','rb'))
+else:
+	urlSet = ["http://music.163.com/discover/playlist"]
+
+if os.path.exists('visit'):
+	hashVisited = pickle.load(open('visit','rb'))
+	
+print('playlist: ', len(hashPlaylist))
+print('song: ', len(hashSong))
+print('url: ', len(urlSet))
+print('visited: ', len(hashVisited))
+filePlaylist = open("playlist",'a')
+fileSong = open("song",'a')
+
+
+while True and (getUrlset() or getThreads()):
 	time.sleep(0.001)
 	if lock.acquire():
 		if threads<maxThreads and urlSet:
 			curPage = urlSet.pop()
+			flag = True
 			if hashVisited.get(curPage,False)==True:
-				curPage = urlSet.pop()
 				while hashVisited.get(curPage,False)==True:
+					if not urlSet:
+						flag = False
+						break
 					curPage = urlSet.pop()
+			if not flag:
+				lock.release()
+				time.sleep(0.01)
+				continue
 			hashVisited[curPage]=True
 			threads+=1
-			try:
-				print("curUrls: ",len(urlSet),"\t","curThreads: ",threads,"\t","curPages: ",maxPage)
-			except:
-				pass
+			if printTime %100 == 0:
+				try:
+					print("Urls: ",len(urlSet),"\t","Threads: ",threads,"\t","Pages: ",Page,'\t','Time: %.2f'%(time.time() - timeLast),'\t','Songs: ',songs)
+					timeLast = time.time()
+				except:
+					pass
+			if printTime %10000 == 0:
+				printTime-=10000
+				pickle.dump(urlSet,open('url','wb'))
+				pickle.dump(hashVisited,open('visit','wb'))
+				
+			printTime+=1	
+		
 			threading.Thread(target=deal,args=(curPage,)).start()
 		lock.release()
 		
@@ -143,7 +173,7 @@ while maxPage>0 and (getUrlset() or getThreads()):
 while True:
 	time.sleep(0.5)
 	if lock.acquire():	
-		print("Url: ",len(urlSet),"\t","Threads: ",threads,"\t","Pages: ",maxPage)
+		print("Urls: ",len(urlSet),"\t","Threads: ",threads,"\t","Pages: ",Page,'\t','Time: %.2f'%(time.time() - timeLast),'\t','Songs: ',songs)
 		if not threads:
 			lock.release()
 			break

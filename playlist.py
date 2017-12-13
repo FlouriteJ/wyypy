@@ -1,7 +1,3 @@
-#encoding=utf-8
-#import sys,io
-#sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='gb18030')
-
 import requests
 import re
 from bs4 import BeautifulSoup
@@ -14,7 +10,7 @@ headers = {
 "Referer":"http://music.163.com/",
 "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"}
 
-def Find2(pat,text):
+def Find(pat,text):
 	match = re.search(pat,text)
 	if match == None:
 		return ''
@@ -28,21 +24,21 @@ def getPlaylist2(idPlaylist):
 	text = r.text
 	
 	patTitle = r'(?:data-res-name=")(.+?)(?:")'
-	title = Find2(patTitle,text)
+	title = Find(patTitle,text)
 	#梦里走了许多路，醒来也要走下去
 	title = re.sub(',','，',title)
 
 	patAuthor = r'(?:data-res-author=")(.+?)(?:")'
-	author = Find2(patAuthor,text)	
+	author = Find(patAuthor,text)	
 	#给我一颗糖好吗
 	
 	# patDescription = r'(?:<meta name="description" content=")(.*?)(?:" />)'
-	# description = Find2(patDescription,text)
+	# description = Find(patDescription,text)
 	# #梦里走了许多路，醒来还是在床上？……
 	# description = re.sub('\n','',description)
 	
 	patImage = r'(?:"images": \[")(.*?)(?:"\])'
-	image = Find2(patImage,text)
+	image = Find(patImage,text)
 	#http://p1.music.126.net/vIw7wO2mPkJunPOSUODyCg==/109951163081338075.jpg
 	
 	tags_list = re.findall('(?:<a class="u-tag" .+?<i>)(.+?)(?:</i></a>)',text)

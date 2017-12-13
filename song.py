@@ -1,7 +1,3 @@
-#encoding=utf-8
-#import sys,io
-#sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='gb18030')
-
 import requests
 import re
 from bs4 import BeautifulSoup
@@ -14,7 +10,7 @@ headers = {
 "Referer":"http://music.163.com/",
 "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"}
 
-def Find2(pat,text):
+def Find(pat,text):
 	match = re.search(pat,text)
 	if match == None:
 		return ''
@@ -29,19 +25,19 @@ def getSong2(idSong = "246316"):
 	text = r.text
 	
 	patTitle = r'(?:data-res-name=")(.+?)(?:")'
-	title = Find2(patTitle,text)
+	title = Find(patTitle,text)
 	#飞
 
 	patAuthor = r'(?:data-res-author=")(.+?)(?:")'
-	author = Find2(patAuthor,text)	
+	author = Find(patAuthor,text)	
 	#洪辰
 	
 	patAlbum = r'(?:class="s-fc7">)(.*?)(?:</a>)'
-	album = Find2(patAlbum,text)
+	album = Find(patAlbum,text)
 	#72小姐
 	
 	patImage = r'(?:class="j-img" data-src=")(.*?jpg)(?:">)'
-	image = Find2(patImage,text)
+	image = Find(patImage,text)
 	#http://p1.music.126.net/Y0MWOGVy-xhVRyhT_LnSVQ==/109951163077105754.jpg
 	
 	t = ','.join([idSong,title,author,album,image])
