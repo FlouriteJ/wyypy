@@ -6,14 +6,15 @@ import re
 headers = {
 "Host":"music.163.com",
 "Referer":"http://music.163.com/",
-"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36"}
+"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.37"}
 
 def Find(pat,text):
-	match = re.search(pat,text,flags=re.DOTALL)
+	match = re.search(pat,text)
 	if match == None:
 		return ''
+	#print(match.group(1))
 	return match.group(1)
-
+	
 def gethttpLinks(content, page = 'http://music.163.com/'):
     reg = r'(?:a href=\")(.+?)(?:\")'
     ulrre = re.compile(reg)
@@ -105,7 +106,21 @@ def getUser(idUser = "488658914"):
 	title = Find(patTitle,text)
 	#TODO:需要检验此函数
 	return title
-		
+
+def getComment(idSong):
+	url = "http://music.163.com/weapi/v1/resource/comments/R_SO_4_"+ idSong +"/?csrf_token=" 
+	params = b'O5/yxckUkfK03FP34r7bgJVnmX5k2/G/l+JCIrgOQwyl+J53UnkgD1kh9z4b6IVTfsjcxGSpGImwZD9kofBZOZTdVyWchjIZes8sb6tnAWuqdC4/j7mOH13VQxx3TDUy'
+	encSecKey = '257348aecb5e556c066de214e531faadd1c55d814f9be95fd06d6bff9f4c7a41f831f6394d5a3fd2e3881736d94a02ca919d952872e7d0a50ebfa1769a7a62d512f5f1ca21aec60bc3819a9c3ffca5eca9a0dba6d6f7249b06f5965ecfff3695b54e1c28f3f624750ed39e7de08fc8493242e26dbc4484a01c76f739e135637c'
+	data = { "params": params, "encSecKey": encSecKey } 
+	response = requests.post(url, headers=headers, data=data)
+	json_text = response.text 
+	json_dict = json.loads(json_text) 
+	total = json_dict['total']
+	content_list = []
+	for item in json_dict['hotComments']: 
+		content_list.append(item['content'])
+	return total,content_list
+	
 def detectPlaylist(text):
 	playList = re.findall(r"(?:/playlist\?id=)(\d+)",text)
 	# print("playList Len= ",end = '')
@@ -130,7 +145,6 @@ def detectAbum(text):
 	# print("albumList Len= ",end = '')
 	# print(len(albumList))
 	return albumList
-	
 	
 if __name__=='__main__':
 	pass

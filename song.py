@@ -46,10 +46,6 @@ def getSong2(idSong = "246316"):
 		fileSong.write(t.encode('utf-8'))
 		fileSong.write('\n'.encode('utf-8'))
 		threads-=1
-		try:
-			print("threads= ",threads,'\t',idSong)
-		except:
-			pass
 		lock.release()
 	
 f = open('song','r')
@@ -58,15 +54,27 @@ line = f.readline()
 maxThreads = 100
 threads = 0
 lock = threading.Lock()
-
+count = 0
+last =time.time()
 while line:
 	id = line.strip('\n')
-	time.sleep(0.005)
-	if lock.acquire():
-		if threads<maxThreads:
-			threading.Thread(target=getSong2,args=(id,)).start()
+	time.sleep(0.001)
+	if threads<maxThreads:
+		if lock.acquire():
 			threads+=1
 		lock.release()
+		
+		threading.Thread(target=getSong2,args=(id,)).start()
+		
+		if count==100:
+			try:
+				print("threads= ",threads,'\t',id,'\t','time= %.2f'%(time.time()-last))
+			except:
+				pass
+			count-=100
+			last = time.time()
+		count+=1
+		
 	line = f.readline()
 while True:
 	time.sleep(0.5)

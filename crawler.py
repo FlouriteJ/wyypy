@@ -5,6 +5,7 @@ import time
 import threading
 import random
 import pickle
+import json
 from pynm import *
 
 def refresh():
@@ -48,15 +49,17 @@ def union_bfs(a,b):
 	a.reverse()
 	
 def deal(curPage):
-	global lock,Page,urlSet,hashPlaylist,hashSong,threads,songs
+	global lock,Page,urlSet,hashPlaylist,hashSong,threads,songs,error503
 	try:
 		r = requests.get(curPage,headers = headers,timeout=1)
-	except:
+	except Exception as e:
 		if lock.acquire():
 			threads-=1
 			lock.release()			
 		return
 	text = r.text
+	if Find('(503 Service)( Temporarily Unavailable)',text):
+		error503 = True
 	dpl = detectPlaylist(text)
 	ds = detectSong(text)
 	links = getLinks(text)
@@ -71,8 +74,6 @@ def deal(curPage):
 				hashSong[x] = True
 				fileSong.write(x+'\n')
 				songs+=1
-		# print("linksNum: ",end = '')
-		# print(len(links))
 		if links:
 			union_bfs(urlSet,links)
 		Page+=1
@@ -94,7 +95,7 @@ def getUrlset():
 	return x	
 
 # Initialization
-refresh()
+# refresh()
 Page = 0
 maxThreads = 500
 hashVisited = {}
@@ -134,8 +135,13 @@ print('visited: ', len(hashVisited))
 filePlaylist = open("playlist",'a')
 fileSong = open("song",'a')
 
-
-while True and (getUrlset() or getThreads()):
+error503 = False
+while (getUrlset() or getThreads()):
+	if error503:
+		print(503)
+		time.sleep(30)
+		error503 = False
+		break
 	time.sleep(0.001)
 	if lock.acquire():
 		if threads<maxThreads and urlSet:
@@ -154,6 +160,8 @@ while True and (getUrlset() or getThreads()):
 			hashVisited[curPage]=True
 			threads+=1
 			if printTime %100 == 0:
+				if time.time() - timeLast<1:
+					time.sleep(1.0-(time.time() - timeLast))
 				try:
 					print("Urls: ",len(urlSet),"\t","Threads: ",threads,"\t","Pages: ",Page,'\t','Time: %.2f'%(time.time() - timeLast),'\t','Songs: ',songs)
 					timeLast = time.time()
@@ -163,7 +171,7 @@ while True and (getUrlset() or getThreads()):
 				printTime-=10000
 				pickle.dump(urlSet,open('url','wb'))
 				pickle.dump(hashVisited,open('visit','wb'))
-				
+				print('-'*10+'pickled'+'-'*10)
 			printTime+=1	
 		
 			threading.Thread(target=deal,args=(curPage,)).start()
