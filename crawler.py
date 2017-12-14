@@ -6,8 +6,9 @@ import threading
 import random
 import pickle
 import json
-from pynm import *
 
+from pynm import *
+	
 def refresh():
 	fileList = ['song','url','playlist','visit']
 	for file in fileList:
@@ -49,12 +50,13 @@ def union_bfs(a,b):
 	a.reverse()
 	
 def deal(curPage):
-	global lock,Page,urlSet,hashPlaylist,hashSong,threads,songs,error503
+	global lock,Page,urlSet,hashPlaylist,hashSong,threads,songs,error503,success,fail
 	try:
 		r = requests.get(curPage,headers = headers,timeout=1)
 	except Exception as e:
 		if lock.acquire():
 			threads-=1
+			fail+=1
 			lock.release()			
 		return
 	text = r.text
@@ -78,6 +80,7 @@ def deal(curPage):
 			union_bfs(urlSet,links)
 		Page+=1
 		threads-=1
+		success+=1
 		lock.release()
 
 def getThreads():
@@ -107,33 +110,35 @@ songs = 0
 maxUrl = 200000
 printTime = 0
 timeLast = time.time()
+success = 0
+fail = 0
 
-if os.path.exists('playlist'):
-	filePlaylist = open("playlist",'r')
+if os.path.exists('playlist.db'):
+	filePlaylist = open("playlist.db",'r')
 	for line in filePlaylist:
 		hashPlaylist[line.strip('\n')] = True
 	filePlaylist.close()
 
-if os.path.exists('song'):
-	fileSong = open("song",'r')
+if os.path.exists('song.db'):
+	fileSong = open("song.db",'r')
 	for line in fileSong:
 		hashSong[line.strip('\n')] = True	
 	fileSong.close()
 	
-if os.path.exists('url'):
-	urlSet = pickle.load(open('url','rb'))
+if os.path.exists('url.db'):
+	urlSet = pickle.load(open('url.db','rb'))
 else:
 	urlSet = ["http://music.163.com/discover/playlist"]
 
-if os.path.exists('visit'):
-	hashVisited = pickle.load(open('visit','rb'))
+if os.path.exists('visit.db'):
+	hashVisited = pickle.load(open('visit.db','rb'))
 	
 print('playlist: ', len(hashPlaylist))
 print('song: ', len(hashSong))
 print('url: ', len(urlSet))
 print('visited: ', len(hashVisited))
-filePlaylist = open("playlist",'a')
-fileSong = open("song",'a')
+filePlaylist = open("playlist.db",'a')
+fileSong = open("song.db",'a')
 
 error503 = False
 while (getUrlset() or getThreads()):
@@ -160,17 +165,20 @@ while (getUrlset() or getThreads()):
 			hashVisited[curPage]=True
 			threads+=1
 			if printTime %100 == 0:
-				if time.time() - timeLast<1:
-					time.sleep(1.0-(time.time() - timeLast))
+				# if time.time() - timeLast<1:
+					# time.sleep(1.0-(time.time() - timeLast))
 				try:
-					print("Urls: ",len(urlSet),"\t","Threads: ",threads,"\t","Pages: ",Page,'\t','Time: %.2f'%(time.time() - timeLast),'\t','Songs: ',songs)
+
+					print("Urls: ",len(urlSet),"\t","Threads: ",threads,"\t","Pages: ",Page,'\t','Time: %.2f'%(time.time() - timeLast),'\t','Songs: ',songs,'\t','quality: %.2f'%(float(success)*100/(success+fail+1)))
 					timeLast = time.time()
+					success = 0
+					fail = 0
 				except:
 					pass
 			if printTime %10000 == 0:
 				printTime-=10000
-				pickle.dump(urlSet,open('url','wb'))
-				pickle.dump(hashVisited,open('visit','wb'))
+				pickle.dump(urlSet,open('url.db','wb'))
+				pickle.dump(hashVisited,open('visit.db','wb'))
 				print('-'*10+'pickled'+'-'*10)
 			printTime+=1	
 		

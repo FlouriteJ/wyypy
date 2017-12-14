@@ -2,6 +2,7 @@
 # sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='gb18030')
 import requests
 import re
+import json
 
 headers = {
 "Host":"music.163.com",
@@ -32,34 +33,37 @@ def gethttpLinks(content, page = 'http://music.163.com/'):
 def getPlaylist(idPlaylist = "2010827278"): 
 	"""title,author,tags_list,description,image,songs_list"""
 	
-	urlPlaylist = "http://music.163.com/playlist?id="
-	r = requests.get(urlPlaylist + idPlaylist,headers = headers)
+	urlPlaylist = "http://music.163.com/api/playlist/detail?id=%s&upd"%(idPlaylist)
+	r = requests.get(urlPlaylist,headers = headers)
 	text = r.text
+	json_dict = json.loads(text) 
+	print()
 	
-	patTitle = r'(?:data-res-name=")(.+?)(?:")'
-	title = Find(patTitle,text)
+	title = json_dict['result']['name']
 	#梦里走了许多路，醒来也要走下去
-
-	patAuthor = r'(?:data-res-author=")(.+?)(?:")'
-	author = Find(patAuthor,text)	
+	
+	
+	author = json_dict['result']['creator']['nickname']
 	#给我一颗糖好吗
 	
 	# patKeywords =  r'(?:<meta name="keywords" content=")(.+?)(?:" />)'
 	# keywords = Find(patKeywords,text)
 	# #梦里走了许多路，醒来也要走下去，给我一颗糖好吗，华语，流行，校园
 	
-	patDescription = r'(?:<meta name="description" content=")(.*?)(?:" />)'
-	description = Find(patDescription,text)
-	#梦里走了许多路，醒来还是在床上？……
-	
-	patImage = r'(?:"images": \[")(.*?)(?:"\])'
-	image = Find(patImage,text)
-	#http://p1.music.126.net/vIw7wO2mPkJunPOSUODyCg==/109951163081338075.jpg
-	
-	tags_list = re.findall('(?:<a class="u-tag" .+?<i>)(.+?)(?:</i></a>)',text)
+	tags_list = json_dict['result']['tags']
 	#['华语', '流行', '校园']
 	
-	songs_list = re.findall('(?:<li><a href="/song\?id=)(.+?)(?:">)',text)
+	description = json_dict['result']['description']
+	#梦里走了许多路，醒来还是在床上？……
+	
+	image = json_dict['result']['coverImgUrl']
+	#http://p1.music.126.net/vIw7wO2mPkJunPOSUODyCg==/109951163081338075.jpg
+	
+	
+	songs_list = []
+	tracks = json_dict['result']['tracks']
+	for track in tracks:
+		songs_list.append(str(track['id']))
 	#['246316', '394722', '472435973', '27588743', '436355876', '205549', '519250024', '25641032', '186103', '26562231', '406072138', '168091', '29713016', '29583952', '29328047', '27630567', '156016', '340395', '31445772', '5245936', '205978', '400162138', '381825', '518895142', '167975', '426026314', '504215085', '191240', '350815', '139357', '350749', '25657589', '30569534', '443292570', '472462728', '5254338', '484057003', '176675', '472442212', '191278', '29418039', '167880', '25713024', '240175', '350803', '191285', '29418037', '25706282', '5251354', '444548903', '22853023', '28798772', '28029031', '4874158', '27984963', '28160015', '436699254', '422463501', '420125810', '355992']
 	
 	return title,author,tags_list,description,image,songs_list

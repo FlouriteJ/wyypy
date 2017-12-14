@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 import json
 import time
 import threading
+import os
+import pickle
 
 headers = {
 "Host":"music.163.com",
@@ -19,11 +21,17 @@ def Find(pat,text):
 
 
 def getSong2(idSong = "246316"):
-	global fileSong,lock,threads
+	global fileSong,lock,threads,hashSongvisited
 	urlSong = 'http://music.163.com/song?id='
-	r = requests.get(urlSong + idSong,headers = headers)
+	try:
+		r = requests.get(urlSong + idSong,headers = headers,timeout = 1)
+	except:
+		if lock.acquire():
+			threads-=1
+			lock.release()
+			return
 	text = r.text
-	
+			
 	patTitle = r'(?:data-res-name=")(.+?)(?:")'
 	title = Find(patTitle,text)
 	#飞
@@ -46,36 +54,47 @@ def getSong2(idSong = "246316"):
 		fileSong.write(t.encode('utf-8'))
 		fileSong.write('\n'.encode('utf-8'))
 		threads-=1
+		hashSongvisited[idSong] = True
 		lock.release()
+
+#Initialization
+if os.path.exists('song_visit.db'):
+	hashSongvisited = pickle.load(open('song_visit.db','rb'))
+else:
+	hashSongvisited = {}
 	
-f = open('song','r')
-fileSong = open('song_details','wb')
-line = f.readline()
-maxThreads = 100
+print('visited: ', len(hashSongvisited))
+
+f = open('song.db','r')
+fileSong = open('song_details.db','ab')
+maxThreads = 500
 threads = 0
 lock = threading.Lock()
-count = 0
-last =time.time()
-while line:
+count = 1
+last = time.time()
+alpha = 0.8
+for line in f:
 	id = line.strip('\n')
-	time.sleep(0.001)
 	if threads<maxThreads:
-		if lock.acquire():
-			threads+=1
-		lock.release()
-		
-		threading.Thread(target=getSong2,args=(id,)).start()
-		
-		if count==100:
-			try:
-				print("threads= ",threads,'\t',id,'\t','time= %.2f'%(time.time()-last))
-			except:
-				pass
-			count-=100
-			last = time.time()
-		count+=1
-		
-	line = f.readline()
+		if hashSongvisited.get(id,False)==False:
+			if lock.acquire():
+				threads+=1
+				lock.release()
+			time.sleep(0.005)
+			threading.Thread(target=getSong2,args=(id,)).start()
+			count+=1
+			if count%100==0:
+				if time.time()-last < alpha:
+					time.sleep(alpha-(time.time()-last))
+				try:
+					print("threads= ",threads,'\t',len(hashSongvisited),'\t','time= %.2f'%(time.time()-last))
+				except:
+					pass
+				last = time.time()
+			if count>=2000:
+				pickle.dump(hashSongvisited,open('song_visit.db','wb'))
+				print('-'*10+'pickled'+'-'*10)
+				count-=2000
 while True:
 	time.sleep(0.5)
 	if lock.acquire():
