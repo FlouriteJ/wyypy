@@ -4,4 +4,5 @@ bu/
 reconstruct/
 
 clean.py
+.gitignore
 *.db
