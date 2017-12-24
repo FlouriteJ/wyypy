@@ -1,5 +1,5 @@
 # crawler-netease-music
-# Collaborators#
-Dream-0o Menmmy
-snoopycat snooty
-codenie Dainny
+## Collaborators
+###Menmmy(@Dream-0o)
+###snooty(@snoopycat)
+###Dainny(@codenie)
