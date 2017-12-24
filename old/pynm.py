@@ -95,10 +95,11 @@ def getLyric(idSong = "246316"):
 	urlLyric = 'http://music.163.com/api/song/lyric?os=pc&id=' + idSong + '&lv=-1&kv=-1&tv=-1'
 	r = requests.get(urlLyric,headers = headers)
 	text = r.text
-	
-	patLyric = '(?:"lyric":")(.+?)(?:")'
-	lyric = Find(patLyric,text)
-	lyric = re.sub(r'\[.+?\]','',lyric)
+	print(r.text)
+	patLyric = '(?:"lyric":")(.+?)(?:"})'
+	lyrics = re.findall(patLyric,text)
+	# lyric = re.sub(r'\[.+?\]','',lyric)
+	lyric = '|&&|'.join(lyrics)
 	return lyric
 	
 def getUser(idUser = "488658914"):
@@ -151,4 +152,4 @@ def detectAbum(text):
 	return albumList
 	
 if __name__=='__main__':
-	pass
+	print(getLyric('2925124'))
