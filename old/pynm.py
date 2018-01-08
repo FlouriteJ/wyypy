@@ -37,7 +37,6 @@ def getPlaylist(idPlaylist = "2010827278"):
 	r = requests.get(urlPlaylist,headers = headers)
 	text = r.text
 	json_dict = json.loads(text) 
-	print()
 	
 	title = json_dict['result']['name']
 	#梦里走了许多路，醒来也要走下去
@@ -65,8 +64,13 @@ def getPlaylist(idPlaylist = "2010827278"):
 	for track in tracks:
 		songs_list.append(str(track['id']))
 	#['246316', '394722', '472435973', '27588743', '436355876', '205549', '519250024', '25641032', '186103', '26562231', '406072138', '168091', '29713016', '29583952', '29328047', '27630567', '156016', '340395', '31445772', '5245936', '205978', '400162138', '381825', '518895142', '167975', '426026314', '504215085', '191240', '350815', '139357', '350749', '25657589', '30569534', '443292570', '472462728', '5254338', '484057003', '176675', '472442212', '191278', '29418039', '167880', '25713024', '240175', '350803', '191285', '29418037', '25706282', '5251354', '444548903', '22853023', '28798772', '28029031', '4874158', '27984963', '28160015', '436699254', '422463501', '420125810', '355992']
+	shareCount = str(json_dict['result']['shareCount'])
+	playCount = str(json_dict['result']['playCount'])
+	subscribedCount = str(json_dict['result']['subscribedCount'])
+	commentCount = str(json_dict['result']['commentCount'])
+	# popularity_list = str(json_dict['result']['popularity'])
 	
-	return title,author,tags_list,description,image,songs_list
+	return title,author,tags_list,description,image,songs_list,shareCount,playCount,subscribedCount,commentCount
 
 def getSong(idSong = "246316"):
 	"""title,author,album,image"""
@@ -82,6 +86,12 @@ def getSong(idSong = "246316"):
 	author = Find(patAuthor,text)	
 	#洪辰
 	
+	patArtist = r'(?:href="/artist\?id=)(.+?)(?:")'
+	idArtist = Find(patArtist,text)
+	
+	patIdalbum = r'(?:href="/album\?id=)(.+?)(?:")'
+	idAlbum = Find(patIdalbum,text)
+	
 	patAlbum = r'(?:class="s-fc7">)(.*?)(?:</a></p>)'
 	album = Find(patAlbum,text)
 	#72小姐
@@ -89,7 +99,7 @@ def getSong(idSong = "246316"):
 	patImage = r'(?:class="j-img" data-src=")(.*?)(?:">)'
 	image = Find(patImage,text)
 	
-	return title,author,album,image
+	return title,author,album,image,idArtist,idAlbum
 
 def getLyric(idSong = "246316"):
 	urlLyric = 'http://music.163.com/api/song/lyric?os=pc&id=' + idSong + '&lv=-1&kv=-1&tv=-1'
@@ -122,9 +132,15 @@ def getComment(idSong):
 	json_dict = json.loads(json_text) 
 	total = json_dict['total']
 	content_list = []
+	likedCount_list = []
+	userId_list = []
+	nickname_list = []
 	for item in json_dict['hotComments']: 
 		content_list.append(item['content'])
-	return total,content_list
+		likedCount_list.append(item['likedCount'])
+		userId_list.append(item['user']['userId'])
+		nickname_list.append(item['user']['nickname'])
+	return total,content_list,likedCount_list,userId_list,nickname_list
 	
 def detectPlaylist(text):
 	playList = re.findall(r"(?:/playlist\?id=)(\d+)",text)
@@ -152,4 +168,4 @@ def detectAbum(text):
 	return albumList
 	
 if __name__=='__main__':
-	print(getLyric('2925124'))
+	print(getSong())
