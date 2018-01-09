@@ -39,21 +39,21 @@ def getPlaylist(idPlaylist = "2010827278"):
 	json_dict = json.loads(text) 
 	
 	title = json_dict['result']['name']
-	#æ¢¦é‡Œèµ°äº†è®¸å¤šè·¯ï¼Œé†’æ¥ä¹Ÿè¦èµ°ä¸‹å»
+	#ÃÎÀï×ßÁËĞí¶àÂ·£¬ĞÑÀ´Ò²Òª×ßÏÂÈ¥
 	
 	
 	author = json_dict['result']['creator']['nickname']
-	#ç»™æˆ‘ä¸€é¢—ç³–å¥½å—
+	#¸øÎÒÒ»¿ÅÌÇºÃÂğ
 	
 	# patKeywords =  r'(?:<meta name="keywords" content=")(.+?)(?:" />)'
 	# keywords = Find(patKeywords,text)
-	# #æ¢¦é‡Œèµ°äº†è®¸å¤šè·¯ï¼Œé†’æ¥ä¹Ÿè¦èµ°ä¸‹å»ï¼Œç»™æˆ‘ä¸€é¢—ç³–å¥½å—ï¼Œåè¯­ï¼Œæµè¡Œï¼Œæ ¡å›­
+	# #ÃÎÀï×ßÁËĞí¶àÂ·£¬ĞÑÀ´Ò²Òª×ßÏÂÈ¥£¬¸øÎÒÒ»¿ÅÌÇºÃÂğ£¬»ªÓï£¬Á÷ĞĞ£¬Ğ£Ô°
 	
 	tags_list = json_dict['result']['tags']
-	#['åè¯­', 'æµè¡Œ', 'æ ¡å›­']
+	#['»ªÓï', 'Á÷ĞĞ', 'Ğ£Ô°']
 	
 	description = json_dict['result']['description']
-	#æ¢¦é‡Œèµ°äº†è®¸å¤šè·¯ï¼Œé†’æ¥è¿˜æ˜¯åœ¨åºŠä¸Šï¼Ÿâ€¦â€¦
+	#ÃÎÀï×ßÁËĞí¶àÂ·£¬ĞÑÀ´»¹ÊÇÔÚ´²ÉÏ£¿¡­¡­
 	
 	image = json_dict['result']['coverImgUrl']
 	#http://p1.music.126.net/vIw7wO2mPkJunPOSUODyCg==/109951163081338075.jpg
@@ -80,11 +80,11 @@ def getSong(idSong = "246316"):
 	
 	patTitle = r'(?:data-res-name=")(.+?)(?:")'
 	title = Find(patTitle,text)
-	#é£
+	#·É
 
 	patAuthor = r'(?:data-res-author=")(.+?)(?:")'
 	author = Find(patAuthor,text)	
-	#æ´ªè¾°
+	#ºé³½
 	
 	patArtist = r'(?:href="/artist\?id=)(.+?)(?:")'
 	idArtist = Find(patArtist,text)
@@ -94,7 +94,7 @@ def getSong(idSong = "246316"):
 	
 	patAlbum = r'(?:class="s-fc7">)(.*?)(?:</a></p>)'
 	album = Find(patAlbum,text)
-	#72å°å§
+	#72Ğ¡½ã
 	
 	patImage = r'(?:class="j-img" data-src=")(.*?)(?:">)'
 	image = Find(patImage,text)
@@ -105,7 +105,6 @@ def getLyric(idSong = "246316"):
 	urlLyric = 'http://music.163.com/api/song/lyric?os=pc&id=' + idSong + '&lv=-1&kv=-1&tv=-1'
 	r = requests.get(urlLyric,headers = headers)
 	text = r.text
-	print(r.text)
 	patLyric = '(?:"lyric":")(.+?)(?:"})'
 	lyrics = re.findall(patLyric,text)
 	# lyric = re.sub(r'\[.+?\]','',lyric)
@@ -119,7 +118,7 @@ def getUser(idUser = "488658914"):
 	
 	patTitle = r'(?:data-res-name=")(.+?)(?:")'
 	title = Find(patTitle,text)
-	#TODO:éœ€è¦æ£€éªŒæ­¤å‡½æ•°
+	#TODO:ĞèÒª¼ìÑé´Ëº¯Êı
 	return title
 
 def getComment(idSong):
@@ -142,6 +141,16 @@ def getComment(idSong):
 		nickname_list.append(item['user']['nickname'])
 	return total,content_list,likedCount_list,userId_list,nickname_list
 	
+def getAlbum(idAlbum = "37115236"):
+	urlAlbum = 'http://music.163.com/album?id='
+	r = requests.get(urlAlbum + idAlbum,headers = headers)
+	text = r.text
+	date = Find(r'(?:"pubDate": ")(.+)(?:T)',text)
+	description = Find(r'(?:"description": ")(.+)(?:")',text)
+	# description = re.sub('\n',"|&|",description)
+	return date,description
+	
+
 def detectPlaylist(text):
 	playList = re.findall(r"(?:/playlist\?id=)(\d+)",text)
 	# print("playList Len= ",end = '')
@@ -158,7 +167,6 @@ def detectUser(text):
 	userList = re.findall(r"(?:/user/home\?id=)(\d+)",text)
 	# print("userList Len= ",end = '')
 	# print(len(userList))
-	
 	return userList
 
 def detectAbum(text):
@@ -168,4 +176,4 @@ def detectAbum(text):
 	return albumList
 	
 if __name__=='__main__':
-	print(getSong())
+	print(getAlbum())

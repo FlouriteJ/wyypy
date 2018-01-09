@@ -18,26 +18,24 @@ def Find(pat,text):
 		return ''
 	#print(match.group(1))
 	return match.group(1)
-	
-	
-def getLyric2(idSong = "246316"):
-	global lock,threads,hashLyricvisited,success,fail
-	urlLyric = 'http://music.163.com/api/song/lyric?os=pc&id=' + idSong + '&lv=-1&kv=-1&tv=-1'
+
+def getAlbum2(idAlbum = "37115236"):
+	global fileAlbum,lock,threads,fail,success,hashAlbumvisited
 	try:
-		r = requests.get(urlLyric,headers = headers,timeout = 1)
+		urlAlbum = 'http://music.163.com/album?id='
+		r = requests.get(urlAlbum + idAlbum,headers = headers)
 		text = r.text
-		
-		patLyric = '(?:"lyric":")(.+?)(?:")'
-		lyric = Find(patLyric,text)
-		# lyric = re.sub(r'\[.+?\]','',lyric)
-		
-		fileLyric = open(os.path.join('data_lyric',idSong+'.db'),'wb')
-		fileLyric.write(lyric.encode('utf-8'))
-		fileLyric.close()
+		date = Find(r'(?:"pubDate": ")(.+)(?:T)',text)
+		description = Find(r'(?:"description": ")(.+)(?:")',text)
+		# description = re.sub('\n',"|&|",description)
+
+		t = ','.join([idAlbum,date,description])
 		
 		if lock.acquire():
+			fileAlbum.write(t.encode('utf-8'))
+			fileAlbum.write('|newline|'.encode('utf-8'))
 			threads-=1
-			hashLyricvisited[idSong] = True
+			hashAlbumvisited[idAlbum] = True
 			success+=1
 			lock.release()
 	except:
@@ -45,48 +43,50 @@ def getLyric2(idSong = "246316"):
 			threads-=1
 			fail+=1
 			lock.release()
-#Initialization
-if os.path.exists('lyric_visit.db'):
-	hashLyricvisited = pickle.load(open('lyric_visit.db','rb'))
-else:
-	hashLyricvisited = {}
-	
-print('visited: ', len(hashLyricvisited))
 
-f = open('song.db','r')
-maxThreads = 100
+#Initialization
+if os.path.exists('album_visit2.db'):
+	hashAlbumvisited = pickle.load(open('album_visit2.db','rb'))
+else:
+	hashAlbumvisited = {}
+
+print('visited: ', len(hashAlbumvisited))
+
+f = open('album.db','r')
+fileAlbum = open('album_details2.db','ab')
+maxThreads = 500
 threads = 0
 lock = threading.Lock()
 count = 1
 last = time.time()
-alpha = 1
+alpha = 1.5
+beta = 1
 success = 0
 fail = 0
-beta = 1
 for line in f:
 	id = line.strip('\n')
 	while threads>=maxThreads:
 		time.sleep(0.01)
-	if hashLyricvisited.get(id,False)==False:
+	if hashAlbumvisited.get(id,False)==False:
 		if lock.acquire():
 			threads+=1
 			lock.release()
-		time.sleep(0.01 + 0.1*(1-beta))
-		threading.Thread(target=getLyric2,args=(id,)).start()
+		time.sleep(0.005 + 0.05*(1-beta))
+		threading.Thread(target=getAlbum2,args=(id,)).start()
 		count+=1
 		if count%100==0:
 			if time.time()-last < alpha:
 				time.sleep(alpha-(time.time()-last))
 			try:
 				beta = float(success)/(success+fail+1)
-				print("threads= ",threads,'\t',len(hashLyricvisited),'\t','time= %.2f'%(time.time()-last),'\t%.2f%%'%(beta*100))
+				print("threads= ",threads,'\t',len(hashAlbumvisited),'\t','time= %.2f'%(time.time()-last),'\t%.2f%%'%(beta*100))
 				success = 0
 				fail = 0
 			except:
 				pass
 			last = time.time()
 		if count>=2000:
-			pickle.dump(hashLyricvisited,open('lyric_visit.db','wb'))
+			pickle.dump(hashAlbumvisited,open('album_visit2.db','wb'))
 			print('-'*10+'pickled'+'-'*10)
 			count-=2000
 while True:
@@ -98,4 +98,4 @@ while True:
 		else:
 			lock.release()
 f.close()
-fileLyric.close()
+fileAlbum.close()

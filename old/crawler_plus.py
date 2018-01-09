@@ -52,7 +52,7 @@ def union_bfs(a,b):
 def deal(curPage):
 	global lock,Page,urlSet,hashPlaylist,hashSong,threads,songs,error503,success,fail
 	try:
-		r = requests.get(curPage,headers = headers,timeout=1)
+		r = requests.get(curPage,headers = headers,timeout=2)
 	except Exception as e:
 		if lock.acquire():
 			threads-=1
@@ -147,7 +147,7 @@ while (getUrlset() or getThreads()):
 		time.sleep(30)
 		error503 = False
 		break
-	time.sleep(0.001)
+	time.sleep(0.01)
 	if lock.acquire():
 		if threads<maxThreads and urlSet:
 			curPage = urlSet.pop()

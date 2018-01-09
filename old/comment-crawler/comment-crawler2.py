@@ -33,7 +33,7 @@ def getComment2(idSong):
 			userId_list.append(str(item['user']['userId']))
 			nickname_list.append(item['user']['nickname'])
 			
-		t ='|&&&|'.join([str(total),'|&&|'.join(content_list),'|&&|'.join(likedCount_list),'|&&|'.join(userId_list),'|&&|'.join(nickname_list)])
+		t ='|&&&|'.join([idSong,str(total),'|&&|'.join(content_list),'|&&|'.join(likedCount_list),'|&&|'.join(userId_list),'|&&|'.join(nickname_list)])
 		if lock.acquire():
 			success+=1
 			fileComment.write(t.encode('utf-8'))
@@ -74,7 +74,7 @@ for line in f:
 		if lock.acquire():
 			threads+=1
 			lock.release()
-		time.sleep(0.005 + 0.01 *(1-beta))
+		time.sleep(0.005 + 0.02 *(1-beta))
 		threading.Thread(target=getComment2,args=(id,)).start()
 		count+=1
 		if count%100==0:

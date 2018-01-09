@@ -89,7 +89,7 @@ for line in f:
 		if lock.acquire():
 			threads+=1
 			lock.release()
-		time.sleep(0.01 + 0.02*(1-beta))
+		time.sleep(0.005 + 0.05*(1-beta))
 		threading.Thread(target=getSong2,args=(id,)).start()
 		count+=1
 		if count%100==0:
