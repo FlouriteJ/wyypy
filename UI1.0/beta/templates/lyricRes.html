@@ -1,0 +1,155 @@
+$def with (ResultNum, ResultData,key,order)
+
+<!--此处写下你的代码 -->
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/webMainStyle.css" />
+</head>
+
+
+<title >音乐搜索</title>
+
+<!--搜索栏 -->
+<div class="header">
+</div>
+<div class="headertitle">
+    <a href=/ style="color:#7A991A">音乐搜索</a>
+</div>
+<form action="/lyric" method="GET">
+    <div class="searchbox">
+        <input class="txtinput" type="text" name="keyword" placeholder="歌词 歌名 歌手"  value="$key">
+        <input class="txtbutton" type="submit" value="开始搜索" >
+    </div>
+   
+    $if order=="2":
+        <div class="radiolist">
+            <div class="radiobox">
+                <input type="radio" name="order" value="3">order3
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="2" checked>order2
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="1" >order1
+            </div>
+        </div>
+    $elif order=="3":
+        <div class="radiolist">
+            <div class="radiobox">
+                <input type="radio" name="order" value="3" checked>order3
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="2" >order2
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="1" >order1
+            </div>
+        </div>
+    $else:
+        <div class="radiolist">
+            <div class="radiobox">
+                <input type="radio" name="order" value="3">order3
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="2" >order2
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="1" checked>order1
+            </div>
+        </div>
+</form>
+
+
+
+<!--代码结束 -->
+<!--主页 -->
+
+
+<body>
+    <div class="searchheader">
+        <ul>
+            <li><a href="/song?keyword=$:key&order=$:order"><b>歌曲</b></a></li>
+            <li><a href="/playlist?keyword=$:key&order=$:order"><b>歌单</b></a></li>
+            <li><a href="/singer?keyword=$:key&order=$:order"><b>歌手</b></a></li>
+            <li><a href="/album?keyword=$:key&order=$:order"><b>专辑</b></a></li>
+            <li><a style="background-color:rgb(36, 30, 30)" href="#lyric"><b>歌词</b></a></li>
+            <li><a href="/comment?keyword=$:key&order=$:order"><b>评论</b></a></li>
+            <li><a href="/image"><b>图片</b></a></li>
+        </ul>
+    </div>
+<!--搜索导航栏如上 ；结果展示代码如下 -->
+<hr  />
+    $if ResultNum == 0:
+        <div class="info">
+            <em><b>搜索不到结果，换个关键试试吧</b></em>
+        </div>
+    $elif ResultNum == -1:
+        <div class="info">
+            <em><b>搜索的关键词不能为空</b></em>
+        </div>
+        
+    $elif ResultNum == -2:
+        <div class="info">
+            <em><b>您输入的关键词在逻辑分析时出错了，请检查！</b></em>
+        </div>
+    $else:
+        <div class="info">
+            <em><b>$:key</b> 的搜索结果($ResultNum个):</em><br/>
+        </div>
+        
+        <div class="song_list">
+        $for res in ResultData:
+            <dl>
+                <dt><a href=$:res["image"]>
+                    <img src=$:res["image"]/></a>
+                </dt>
+                <dd >
+                    <h3>
+                        <a href="https://music.163.com/#/song?id=$res["ID"]">$res["name"]</a>
+                    </h3>
+                    <div style="float:left;min-width:40%">
+                        <p><div class="d_label"><b>专辑：</b>
+                                <a href="https://music.163.com/#/album?id=36941045">$res["album"]</a>
+                            </div>
+    
+                            <div class="d_label"><b>歌手：</b>
+                                <a href="https://music.163.com/#/artist?id=10559"> $res["singer"]</a>
+                            </div>
+                        </p>
+                        
+                    
+                    </div>
+                    <div style="margin-left:34%;">
+                         <p><div class="d_label"><b>评论数：</b>$res["commentsNum"]</div>
+                        
+                            <div class="d_label"><b>单条评论最高获赞数：</b>$res["maxlikedcount"]</div>
+                        </p>
+
+                    </div>
+                    
+
+                    <p>
+                        <b style="float:left">歌词：</b>
+                        <div class="textbox" style="min-height:180px">
+                            $:res["lyric"]
+                        </div>
+                    </p>
+                    <p>
+                        <div class="play_link">
+                            <b>播放外链:</b><a  href="https://music.163.com/#/outchain/2/$:res["ID"]/"> 网易云</a>
+                        </div>
+                    </p>
+                    <p>
+                        <!-- iframe 暂时放于文件尾部-->
+                    </p>
+                </dd>
+            </dl>
+            
+        </div>
+        <div class="recommend">
+            <p><h2>歌曲推荐</h2></p>
+            <hr/>
+            <p >...</p>
+        </div>
+    </div>
+</body>

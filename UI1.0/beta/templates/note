@@ -1,0 +1,77 @@
+网易云插件 iframe
+
+导航栏：
+歌曲 歌单 歌手 ****评论 专辑
+
+排序:
+评论数 播放数 获赞数
+
+歌单 歌手 评论 专辑  的展示方式？
+
+
+排序 
+表单提供数据，下拉选取以及筛选
+
+
+/*返回顶部小部件*/
+    .go-top {  
+        /*display: none;  */
+        opacity: 0.6;  
+        z-index: 999999;  
+        position: fixed;  
+        bottom: 40px;  
+        left: 86%;  
+        margin-left: 40px;  
+        border: 1px solid #a38a54;  
+        width: 50px;  
+        height: 50px;  
+        background-color: #bfc092;  
+        border-radius: 25px;  
+        cursor: pointer;  
+    }  
+  
+    .go-top:hover {  
+        opacity: 1;  
+        filter: alpha(opacity=100);  
+    }  
+    
+    .go-top div.arrow {  
+        position: absolute;  
+        left: 15px;  
+        top: 3px;  
+        width: 0;  
+        height: 0;  
+        border: 9px solid transparent;  
+        border-bottom-color: #0066cc;  
+    }  
+    
+    .go-top div.stick {  
+        position: absolute;  
+        left: 20px;  
+        top: 20px;  
+        width: 8px;  
+        height: 14px;  
+        display: block;  
+        background-color: #0066cc;  
+        -webkit-border-radius: 1px;  
+        -moz-border-radius: 1px;  
+        border-radius: 1px;  
+    }  
+    /*返回顶部小部件结束*/
+
+
+<head>
+<script src="./static/jquery-3.2.1.min.js">
+    $$(function() {  
+        $$(window).scroll(function() {  
+            if ($$(window).scrollTop() > 600)  
+            $$('div.go-top').show();  
+            else  
+            $$('div.go-top').hide();  
+        });  
+        $$('div.go-top').click(function() {  
+            $$('html, body').animate({scrollTop: 0}, 1000);  
+        });  
+    });  
+</script>
+</head>

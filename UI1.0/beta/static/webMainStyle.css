@@ -1,0 +1,341 @@
+
+a{ 
+    text-decoration:none;
+}
+
+html{
+    /*background:url(/static/bg3.jpg);*/
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: top;
+    background-attachment: fixed;
+    background-color:#24292e;
+}
+body{
+    margin-right: 0;
+    margin-left: 0;
+    margin-top:70px; 
+}
+
+hr{
+    color:black;
+}
+
+.header
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width:100%;
+    height: 70px;
+    background-image: url(/static/bg.jpg);
+    /*background-color:brown;*/
+
+}
+.headertitle{
+    position: fixed;
+    top: 24px;
+    left:3%;
+    margin: 0;
+    font-size: 21;
+}
+
+.headertitle a{
+    color:#7A991A;
+}
+.imgpre{
+    position: fixed;
+    top:0px;
+    right: 75%;
+    max-width:30%;
+    padding:2px;
+    max-height:66px;
+    background-color:#999;
+}
+.imgpre img[id="preview"]{
+    max-height: 66px;
+}
+
+.imgUpload .selectbutton{
+    max-width:250px;
+    height:38px;
+    font-size:16px;
+    font-weight: 700;
+    background: gray;;
+    line-height:40px;
+    border:none;
+    padding-top:3px;
+    padding-left: 8px;
+    padding-right:8px;
+    font-size:16px;
+}
+
+.imgUpload{
+    position: fixed ;
+    top:20px;
+    margin-left:26%;
+}
+.imgUpload  .upbutton{  /*搜索按钮*/
+    
+    max-width:104px;
+    height:38px;
+    font-size:16px;
+    font-weight: 700;
+    background:#38f;
+    color:#FFF;
+    line-height:40px;
+    border:none;
+    padding:0;
+    padding-left: 8px;
+    padding-right:8px;
+    font-size:16px;
+}
+.imgUpload  .upbutton:hover{
+    background:rgb(3, 0, 153);
+}
+
+
+
+.searchbox{
+    position: fixed;
+    width:100%;
+    top:20px;
+    margin-left:15%;
+    width:70%;
+}
+
+.searchbox .txtinput{  /*输入框*/
+            width: 70%;
+            max-width:550px;
+            height:40px;
+            line-height:34px;
+            background:rgba(241, 237, 237, 0.795);
+            border:1px solid;
+            padding: 3;
+            font-size:16px;
+            color:rgb(0, 0, 0);
+}
+.searchbox  .txtbutton{  /*搜索按钮*/
+    
+    max-width:104px;
+    height:38px;
+    font-size:16px;
+    font-weight: 700;
+    background:#38f;
+    color:#FFF;
+    line-height:40px;
+    border:none;
+    padding:0;
+    padding-left: 8px;
+    padding-right:8px;
+    font-size:16px;
+}
+.searchbox .txtbutton:hover{
+    background:rgb(3, 0, 153);
+}
+
+
+/* order*/
+.radiolist{
+    margin-top: 0;
+}
+.radiobox{
+    float:right;
+    margin-right:10px;
+    margin-top:6px;
+    width:80px;
+    font-weight: 600;
+    color: #7A991A;
+}
+.radiobox input{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius:50%;
+    background-color: gray;
+}
+
+.radiobox input:checked{
+    background-color: blue;
+}    
+
+
+.searchheader{
+    margin:0;
+    padding: 10px;
+    padding-top: 16px;
+    padding-left: 32px; 
+    padding: 0px;
+    top:70px;
+    width: 100%;
+    height: 30px;
+    background-color:black;
+}
+
+.searchheader ul{
+    list-style-type:none;
+    margin:0;
+    margin-left: 9%;
+    }
+.searchheader li{
+    /*display:inline;*/
+    float:left;
+    width:100px;
+    height: 29px;
+    }
+.searchheader a:link {
+    font-weight:bold;
+    color:rgb(124, 179, 24);
+    background-color:black;
+    text-align:center;
+    padding:6px;
+    text-decoration:none;
+    text-transform:uppercase;
+    padding-left:34px;
+    padding-right:34px;
+    
+    }
+.searchheader a:visited{
+    font-weight:bold;
+    color:rgb(124, 179, 24);
+    background-color:black;
+    text-align:center;
+    padding:6px;
+    text-decoration:none;
+    text-transform:uppercase;
+    padding-left:20px;
+    padding-right:20px;
+    }
+
+.searchheader a:hover{
+    background-color:rgb(36, 30, 30);
+    }
+.searchheader a:active{
+    background-color:rgb(36, 30, 30);
+    }
+
+/*.searchheader a:link {color:#0000FF;}		/* 未被访问的链接 */
+/*.searchheader a:hover {color:#557755;}	/* 鼠标指针移动到链接上 */
+
+/* info*/
+
+.info{
+    margin-left:11%;
+    font-size: 25px;
+    color: #7A991A;
+}
+
+/*结果style*/
+h1,h2,h3{
+    margin: 0.5em 1em 0.5em 0.5em;
+    /*text-align:center;*/
+}
+
+h3 a{
+    color: black;
+    font-weight:900;  
+} 
+h3 a:hover{
+    color:#f68;
+}
+
+.song_list{
+    padding: 0;
+    margin-left: 10%;
+    margin-right: 35%;
+    margin-bottom: 10px;
+    float: none;
+}
+
+
+.song_list dl {
+    border-top: 2px dashed #e5e5e5;
+    border : 3px solid rgb(175, 162, 162);
+    clear: both;
+    float: left;
+    display: block;
+    background:url(/static/songbg5.jpg);
+    padding: 12px 7px;
+    margin: 12px 8px;
+    -webkit-box-shadow: 0 0 7px rgba(0, 0, 0, .37);
+    -moz-box-shadow: 0 0 7px rgba(0, 0, 0, .37);
+    box-shadow: 0 0 7px rgba(0, 0, 0, .37);
+    width: 97%;
+}
+.song_list img{
+    float: left;
+    margin: 0.5em 1em 0.5em 0.5em;
+    width:250;
+    height:269;
+    border:2px solid gray;
+}
+
+.song_list p{
+    margin: 0;
+    padding: 0;
+}
+
+.song_list .textbox{
+    border: solid 0px gray; 
+    border-radius: 20px;
+    max-height: 102px;
+    /*min-height: 25px; */
+    overflow: scroll; 
+    align-content: center;
+    text-align: center;
+    background-color: rgb(224, 222, 222);
+    scroll-behavior: unset;
+    scrollbar-face-color: #889B9F;
+    scrollbar-shadow-color: #3D5054;
+    scrollbar-highlight-color: #C3D6DA;
+    scrollbar-3dlight-color: #3D5054;
+    scrollbar-darkshadow-color: #85989C;
+    scrollbar-track-color: #95A6AA;
+    scrollbar-arrow-color: #FFD6DA;
+    overflow-x:hidden;
+    overflow-y: hidden;
+}
+.song_list .textbox:hover{
+    background-color: rgb(224, 222, 222);
+    overflow-x:hidden;
+    overflow-y: auto;
+}
+
+.d_label a{
+    color:black;
+    margin-right:0.8rem;
+    }
+/*.d_label a:hover{color:#f68;}*/
+.d_label b{
+    color:#999;
+    padding: 0;
+    margin-right:0.8rem;
+    }
+
+.song_list .play_link{
+    margin-left: 235px;
+}
+.song_list .play_link a{
+    color:#F00;
+}
+.song_list .play_link a:hover{
+    color: #999;
+}
+.song_list iframe{
+    border:0px;
+    margin: 0 0 0 0;
+    width:298px;
+    height:52px;
+}
+.recommend {
+    position: fixed;
+    top:167px;
+    height: 610px;
+    width:230px;
+    padding: 20px;
+    margin-left: 65%;
+    background-color: #C3D6DA;
+    text-align:center;
+}

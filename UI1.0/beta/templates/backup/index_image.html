@@ -1,0 +1,50 @@
+$def with()
+
+<style>
+	body,html{
+		background:url(/static/bg.jpg);
+		min-height:100%;
+		background-size: cover;
+		widows:100%;}
+	.search{
+		width:760px;
+		margin:250px auto;
+		font-size:20px;
+		color:white;
+	}
+    .search .txtingput{
+		width:550px;
+		height:38px;
+		line-height:36px;
+		background:rgba(255,255,255,0.5);
+		border:1px solid;
+		font-size:16px;
+		color:white;
+    }
+    .search .txtbutton{
+    	width:104px;
+    	height:40px;
+    	font-size:16px;
+    	background:#38f;
+    	color:#FFF;
+    	line-height:40px;
+    	border:none;
+    	font-size:16px;
+    }
+    .search .txtbutton:hover{
+    	background:rgb(3, 0, 153);
+    }
+</style>
+
+<div class="search">
+	<div>
+		<div style="color:white">
+			<a href=/>网页</a>
+			图片
+		</div>	
+		<form action="/i" method="GET">
+			<input type="text" name="keyword" class="txtingput">
+			<input type="submit" value="开始搜索" class="txtbutton">
+		</form>
+	</div>
+</div >

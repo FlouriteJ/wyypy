@@ -1,0 +1,129 @@
+$def with (ResultNum, ResultData,key)
+
+<!--此处写下你的代码 -->
+
+<style>
+    a{ 
+        text-decoration:none;
+    }
+    
+    html{
+        /*background:url(/static/bg1.jpg);*/
+        background-position: top;
+        background-attachment: fixed;
+        /*background-color: grey;*/
+    }
+   
+    .header
+    {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width:100%;
+        height: 70px;
+        background-color:brown;
+
+    }
+    .header .headertitle{
+        margin-left:3%;
+        font-size: 21;
+    }
+    .header .txtinput{  /*输入框*/
+                width: 70%;
+                max-width:550px;
+                height:38px;
+                line-height:36px;
+                background:rgba(172, 172, 172, 0.5);
+                border:1px solid;
+                font-size:16px;
+                color:rgb(0, 0, 0);
+    }
+    .header .txtbutton{  /*搜索按钮*/
+        max-width:104px;
+        height:38px;
+        font-size:16px;
+        background:#38f;
+        color:#FFF;
+        line-height:40px;
+        border:none;
+        font-size:16px;
+    }
+    .header .txtbutton:hover{
+        background:rgb(3, 0, 153);
+    }
+
+    form{
+        position: fixed;
+        top:20px;
+        margin-left:15%;
+        width:70%;
+    }
+
+    body{
+        margin-right: 0;
+        margin-left: 0;
+        margin-top:70px;
+        
+    }
+    .searchheader{
+        margin:0;
+        padding: 10px;
+        padding-top: 16px;
+        padding-left: 32px; 
+        top:70px;
+        width: 100%;
+        height: 35px;
+        background-color:gainsboro;
+    }
+
+</style>
+
+<title >音乐搜索</title>
+
+<!--搜索栏 -->
+<div class="header">
+    <br />
+    <a class="headertitle">音乐搜索</a>
+    <form action="/i" method="GET">
+        <input type="text" name="keyword" placeholder="歌词 歌名 歌手"  class="txtinput" value=$key>
+        <input type="submit" value="开始搜索" class="txtbutton">
+    </form>
+
+</div>
+
+<!--代码结束 -->
+<!--主页 -->
+
+<body>
+    <div class="searchheader">
+        <a href=/s><b>歌曲</b></a> <a href=/i><b>歌单</b></a>
+    </div>
+    <div class="searchres">
+        <div class="music">
+
+        </div>
+
+    </div>
+    
+    <hr />
+    $if ResultNum == 0:
+        <h1>搜索的关键词不能为空哦~</h1>
+    $elif ResultNum == -1:
+        <h1>没有找到您想要的！换个关键词试试吧~</h1>
+    $elif ResultNum == -2:
+        <h1> 您输入的关键词在逻辑分析时出错了，请检查！</h1>
+    $else:
+        <em>以下是您需要的搜索结果:</em>
+        <em>一共找到了$ResultNum个网页：</em>
+        $for website in ResultData:
+            <p>
+                <a  target="_blank">
+                    <i>$website["playname"]</i>
+                </a>
+                <div>
+                    <em>$:website["tags"]</em>
+                </div>
+                <i style="color:green">$website["author"]</i>
+            </p>
+    </div>
+</body>

@@ -1,0 +1,183 @@
+$def with (ResultNum, ResultData,key,order,name)
+
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/static/webMainStyle.css" />
+</head>
+
+
+<title >音乐搜索</title>
+
+<!--搜索栏 -->
+<div class="header">
+</div>
+<div class="headertitle">
+    <a href=/ style="color:#7A991A">音乐搜索</a>
+</div>
+<form action="/image" method="POST" enctype="multipart/form-data">
+    <div class="imgpre">
+        <img id="preview" />
+    </div>
+    <div class="imgUpload">
+        <input id="imgPicker" type="file" name="pic" class="selectbutton"/>
+        <input type="submit" value="搜索图片" class="upbutton"/>
+    </div>
+
+    $if order=="2":
+        <div class="radiolist">
+            <div class="radiobox">
+                <input type="radio" name="order" value="sharecount">分享数
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="commentcount" checked>评论数
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="notsort" >默认
+            </div>
+        </div>
+    $elif order=="3":
+        <div class="radiolist">
+            <div class="radiobox">
+                <input type="radio" name="order" value="sharecount" checked>分享数
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="commentcount" >评论数
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="notsort" >默认
+            </div>
+        </div>
+    $else:
+        <div class="radiolist">
+            <div class="radiobox">
+                <input type="radio" name="order" value="sharecount">分享数
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="commentcount" >评论数
+            </div>
+            <div class="radiobox">
+                <input type="radio" name="order" value="notsort" checked>默认
+            </div>
+        </div>
+</form>
+
+
+
+<!--代码结束 -->
+<!--主页 -->
+
+<body>
+    <div class="searchheader">
+        <ul>
+            <li><a href="/song?keyword=$:key&order=$:order"><b>歌曲</b></a></li>
+            <li><a href="/playlist?keyword=$:key&order=$:order"><b>歌单</b></a></li>
+            <li><a href="/singer?keyword=$:key&order=$:order"><b>歌手</b></a></li>
+            <li><a href="/album?keyword=$:key&order=$:order"><b>专辑</b></a></li>
+            <li><a href="/lyric?keyword=$:key&order=$:order"><b>歌词</b></a></li>
+            <li><a href="/comment?keyword=$:key&order=$:order"><b>评论</b></a></li>
+            <li><a style="background-color:rgb(36, 30, 30)" href="/image"><b>图片</b></a></li>
+        </ul>
+    </div>
+<!--搜索导航栏如上 ；结果展示代码如下 -->
+<hr />
+    $if ResultNum == 0:
+        <div class="info">
+            <em><b>搜索不到结果，换个图片试试吧</b></em>
+        </div>
+    $elif ResultNum == -1:
+        <div class="info">
+            <em><b>请先选择图片</b></em>
+        </div>
+        
+    $elif ResultNum == -2:
+        <div class="info">
+            <em><b>您上传的图片在逻辑分析时出错了，请检查！</b></em>
+        </div>
+    $else:
+        <div class="info">
+            <em><b>$:key</b> 的搜索结果($ResultNum个):</em><br/>
+        </div>
+        <div class="song_list">
+        $for res in ResultData:
+            <dl>
+                <!--  -->
+                <dt><a href=$:res["playImage"]>
+                    <img src=$:res["playImage"]/></a>
+                </dt>
+    
+                <dd >
+                    <!-- 歌单名 -->
+                    <h3><a href="https://music.163.com/#/playlist?id=$:res["playID"]">$res["playname"]</a></h3>
+                    
+                    <!-- 歌单信息 -->
+                    <div style="width:34% ;float:left">
+                        <p><div class="d_label"><b>ID：</b>
+                                <a>$:res["playID"]</a>
+                            </div>
+
+                            <div class="d_label"><b>作者：</b>
+                                <a>$res["author"]</a>
+                            </div>
+                        </p>
+                        <p><div class="d_label"><b>歌曲数：</b>
+                                <a>$res["songNum"]</a>
+                            </div>
+                            <div class="d_label"><b>标签：</b>
+                                <a>$:res["tags"]</a>
+                            </div>
+                        </p>
+                    </div>
+                    <div style="float:none">
+                        <p><div class="d_label"><b>分享数：</b>$:res["sharecount"]</div>
+                            <div class="d_label"><b>收藏数：</b>$:res["subscribedcount"]</div>
+                        </p>
+                        <p><div class="d_label"><b>评论数：</b>$:res["commentcount"]</div>
+                            <div class="d_label"><b>播放数：</b>$:res["playcount"]</div>
+                        </p>
+                    </div>
+                    
+                
+                    <p>
+                        <b style="float:left">歌曲列表：</b>
+                        <div class="textbox">
+                            $for i in res["songIDs"]:
+                                <a href="https://music.163.com/#/song?id=$:i">$i<br/><a>
+                            
+                        </div>
+                    </p>
+                    <p>
+                        <div class="play_link" style="display:1">
+                            <b>播放外链:</b><a  href="https://music.163.com/#/outchain/0/$:res["playID"]/"> 网易云</a>
+                        </div>
+                         
+                    </p>
+                </dd>
+            </dl>
+        </div>
+    </div>
+</body>
+
+<script >
+        document.querySelector('#imgPicker')
+        .addEventListener('change', function(){
+            //当没选中图片时，清除预览
+            if(this.files.length === 0){
+                document.querySelector('#preview').src = '';
+                return;
+            }
+            
+            //实例化一个FileReader
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                //当reader加载时，把图片的内容赋值给
+                document.querySelector('#preview').src = e.target.result;
+            };
+
+        //读取选中的图片，并转换成dataURL格式
+        reader.readAsDataURL(this.files[0]);
+    }, false);
+</script>
+
+</html>
