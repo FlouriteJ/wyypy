@@ -1,4 +1,4 @@
 colordescriptor.py 用于生成图片描述子
 createindex.py 用于生成索引
 LSHsearch.py 用于图片搜索匹配
-finalindex.csv 存储索引的文件
+finalindex.zip 存储索引文件finalindex.csv的压缩包（github网页上传文件有大小限制，所以改为压缩包上传）
