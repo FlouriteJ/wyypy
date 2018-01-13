@@ -1,0 +1,4 @@
+colordescriptor.py 用于生成图片描述子
+createindex.py 用于生成索引
+LSHsearch.py 用于图片搜索匹配
+finalindex.csv 存储索引的文件
