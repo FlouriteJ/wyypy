@@ -17,5 +17,6 @@ python search.py
 使用时直接将文件夹index下的文件 拷贝入SearchEngineAndUI文件夹下即可
 **更详细说明在SearchEngineAndUI文件夹下**
 
+#备注 beta文件夹为废弃文件夹
 
 
